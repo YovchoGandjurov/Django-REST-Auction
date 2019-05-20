@@ -6,25 +6,26 @@ from .models import Profile
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'password', 'first_name', 'last_name', 'email')
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ('id', 'username', 'password', 'first_name',
+                  'last_name', 'email')
+        extra_kwargs = {'password': {'write_only': True},}
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'password', 'first_name', 'last_name', 'email')
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ('id', 'username', 'password', 'first_name',
+                  'last_name', 'email')
+        extra_kwargs = {'password': {'required': False, 'write_only': True}}
         read_only_fields = ('username', )
 
 
 class ProfileCreateSerializer(serializers.ModelSerializer):
     user = UserCreateSerializer(required=True)
-    UserCreateSerializer.Meta.read_only_fields = ()
 
     class Meta:
         model = Profile
-        fields = ('id', 'user', 'profile_image', 'language')
+        fields = ('id', 'user', 'profile_image', 'language')        
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
@@ -43,16 +44,18 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ('id', 'user', 'profile_image', 'language')
-        read_only_fields = ('username', )
 
     def update(self, instance, validated_data):
+        # import pdb; pdb.set_trace()
         user_data = validated_data.pop('user', {})
         user_serializer = UserUpdateSerializer(instance.user, data=user_data,
                                                partial=True)
         user_serializer.is_valid(raise_exception=True)
         user_serializer.update(instance.user, user_data)
 
-        instance.user.set_password(user_data['password'])
+        if 'password' in user_data:
+            instance.user.set_password(user_data['password'])
+            instance.user.save()
 
         super(ProfileUpdateSerializer, self).update(instance, validated_data)
         return instance
