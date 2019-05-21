@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_auth',
 
     'accounts',
+    'auctions'
 ]
 
 MIDDLEWARE = [
