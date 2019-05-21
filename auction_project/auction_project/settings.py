@@ -138,7 +138,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-LOGIN_URL = '/accounts/'
+LOGIN_REDIRECT_URL = '/accounts/'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

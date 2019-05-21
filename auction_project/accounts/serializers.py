@@ -8,7 +8,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'password', 'first_name',
                   'last_name', 'email')
-        extra_kwargs = {'password': {'write_only': True},}
+        extra_kwargs = {'password': {'write_only': True}}
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -25,7 +25,7 @@ class ProfileCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'user', 'profile_image', 'language')        
+        fields = ('id', 'user', 'profile_image', 'language')
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
