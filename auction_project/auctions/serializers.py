@@ -2,9 +2,10 @@ from .models import Auction
 from rest_framework import serializers
 
 from accounts.models import Profile
+# from accounts.serializers import ProfileSerializer
 
 
-class CreateAuctionSerializer(serializers.ModelSerializer):
+class AuctionCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Auction
@@ -21,3 +22,12 @@ class CreateAuctionSerializer(serializers.ModelSerializer):
         validated_data['current_price'] = validated_data['initial_price']
         instance = Auction.objects.create(**validated_data)
         return instance
+
+
+class AuctionListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Auction
+        fields = '__all__'
+        exclude = []
+        depth = 1

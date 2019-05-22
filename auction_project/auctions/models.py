@@ -23,7 +23,7 @@ class Auction(models.Model):
     step = models.PositiveIntegerField(default=1)
     status = models.CharField(max_length=50, choices=[
                               (s.name, s.value) for s in StatusEnum],
-                              default=StatusEnum.O)
+                              default='Open')
     category = models.ForeignKey(Category, on_delete=models.CASCADE,
                                  blank=True, null=True)
     owner = models.ForeignKey(Profile,

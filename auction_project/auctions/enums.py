@@ -2,5 +2,5 @@ from enum import Enum
 
 
 class StatusEnum(Enum):
-    O = 'Open'
-    C = 'Closed'
+    Open = 'Open'
+    Closed = 'Closed'
