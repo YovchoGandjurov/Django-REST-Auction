@@ -11,13 +11,13 @@ class AuctionCreateSerializer(serializers.ModelSerializer):
         model = Auction
         fields = ('title', 'description', 'initial_price', 'days_to_end',
                   'step', 'owner')
-        # fields = '__all__'
         read_only_fields = ('current_price', 'number_of_bits', 'created_at',
-                            'status', 'owner', 'winer', 'participants')
+                            'status', 'owner', 'winner', 'participants')
 
     def create(self, validated_data):
-        # import ipdb; ipdb.set_trace()
-        curr_user = Profile.objects.get(user_id=self.context['request'].user.id)
+        curr_user = Profile.objects.get(
+            user_id=self.context['request'].user.id
+        )
         validated_data['owner'] = curr_user
         validated_data['current_price'] = validated_data['initial_price']
         instance = Auction.objects.create(**validated_data)
@@ -30,4 +30,14 @@ class AuctionListSerializer(serializers.ModelSerializer):
         model = Auction
         fields = '__all__'
         exclude = []
-        depth = 1
+        depth = 2
+
+
+class AuctionUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Auction
+        fields = ('title', 'description', 'initial_price', 'days_to_end',
+                  'step', 'owner')
+        read_only_fields = ('current_price', 'number_of_bits', 'created_at',
+                            'status', 'owner', 'winner', 'participants')

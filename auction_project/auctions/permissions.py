@@ -8,11 +8,8 @@ class AdminOrReadOnly(BasePermission):
         return request.user.is_staff or request.user.is_superuser
 
 
-class OpenAuctionsOrAdmin(BasePermission):
+class IsOwnerOrAdmin(BasePermission):
     def has_object_permission(self, request, view, obj):
-        import ipdb; ipdb.set_trace()
         if request.user.is_staff or request.user.is_superuser:
-            sadasdas
             return True
-        sadasdas
-        return obj.status == 'Open'
+        return request.user == obj.owner.user and obj.number_of_bits == 0

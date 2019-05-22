@@ -29,10 +29,10 @@ class Auction(models.Model):
     owner = models.ForeignKey(Profile,
                               on_delete=models.CASCADE,
                               related_name='auction_owner')
-    winer = models.ForeignKey(Profile,
-                              on_delete=models.CASCADE,
-                              related_name='auction_winer',
-                              blank=True, null=True)
+    winner = models.ForeignKey(Profile,
+                               on_delete=models.CASCADE,
+                               related_name='auction_winer',
+                               blank=True, null=True)
     participants = models.ManyToManyField('accounts.Profile',
                                           related_name='auction_participants',
                                           blank=True)
