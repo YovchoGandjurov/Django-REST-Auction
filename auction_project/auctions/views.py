@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from rest_framework import generics
 from rest_framework import permissions
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Auction, Category
 from .serializers import AuctionCreateSerializer, AuctionListSerializer
@@ -19,6 +21,10 @@ class AuctionList(MethodSerializerView, generics.ListCreateAPIView):
         ('GET'): AuctionListSerializer,
         ('POST'): AuctionCreateSerializer
     }
+
+    filter_backends = (filters.OrderingFilter, DjangoFilterBackend)
+    ordering_fields = ('current_price', 'days_to_end')
+    filterset_fields = ('created_at', )
     permission_classes = [AdminOrReadOnly, OpenAuctionsOrAdmin]
 
     def get_queryset(self):
