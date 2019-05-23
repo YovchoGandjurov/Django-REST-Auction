@@ -17,7 +17,7 @@ class Auction(models.Model):
     description = models.TextField()
     initial_price = models.PositiveIntegerField()
     current_price = models.PositiveIntegerField()
-    number_of_bits = models.PositiveIntegerField(default=0)
+    number_of_bids = models.PositiveIntegerField(default=0)
     created_at = models.DateField(auto_now_add=True)
     days_to_end = models.PositiveIntegerField(default=2)
     step = models.PositiveIntegerField(default=1)
