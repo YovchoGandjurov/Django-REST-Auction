@@ -9,7 +9,7 @@ class AuctionCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Auction
-        fields = ('title', 'description', 'initial_price', 'days_to_end',
+        fields = ('title', 'description', 'initial_price', 'closing_data',
                   'step', 'owner')
         read_only_fields = ('current_price', 'number_of_bits', 'created_at',
                             'status', 'owner', 'winner', 'participants')
@@ -29,7 +29,7 @@ class AuctionListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Auction
         fields = '__all__'
-        exclude = []
+        # exclude = []
         depth = 2
 
 
@@ -37,28 +37,21 @@ class AuctionUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Auction
-        fields = ('title', 'description', 'initial_price', 'days_to_end',
+        fields = ('title', 'description', 'initial_price', 'closing_data',
                   'step', 'owner')
         read_only_fields = ('current_price', 'number_of_bits', 'created_at',
                             'status', 'owner', 'winner', 'participants')
 
 
 class AuctionBidListSerializer(serializers.ModelSerializer):
-    closing_date = serializers.SerializerMethodField()
 
     class Meta:
         model = Auction
         fields = ('id', 'title', 'description', 'current_price',
-                  'number_of_bids', 'step', 'closing_date', 'owner',
+                  'number_of_bids', 'step', 'closing_data', 'owner',
                   'winner', 'participants'
                   )
         # depth = 2
-
-    def get_closing_date(self, obj):
-        closing_date = obj.created_at + datetime.timedelta(
-            days=obj.days_to_end
-        )
-        return closing_date
 
 
 class AuctionBidSerializer(serializers.ModelSerializer):

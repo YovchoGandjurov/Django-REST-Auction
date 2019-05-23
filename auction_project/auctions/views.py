@@ -12,7 +12,6 @@ from .models import Auction, Category
 from .serializers import AuctionCreateSerializer, AuctionListSerializer, \
                          AuctionUpdateSerializer, AuctionBidSerializer, \
                          AuctionBidListSerializer
-from .method_serializer_view import MethodSerializerView
 from .permissions import AdminOrReadOnly, IsOwnerOrAdmin
 
 from accounts.models import Profile
@@ -31,7 +30,7 @@ class AuctionList(generics.ListCreateAPIView):
         return AuctionCreateSerializer
 
     filter_backends = (filters.OrderingFilter, DjangoFilterBackend)
-    ordering_fields = ('current_price', 'days_to_end')
+    ordering_fields = ('current_price', 'closing_data')
     filterset_fields = ('created_at', )
     permission_classes = [AdminOrReadOnly]
 
@@ -60,8 +59,9 @@ class AuctionUpdate(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
 
 
-class AuctionBid(MethodSerializerView, viewsets.ModelViewSet):
+class AuctionBid(viewsets.ModelViewSet):
     queryset = Auction.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
