@@ -7,6 +7,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework.permissions import SAFE_METHODS
+from datetime import date
 
 from .models import Auction, Category
 from .serializers import AuctionCreateSerializer, AuctionListSerializer, \
@@ -24,17 +25,26 @@ class AuctionCreate(generics.CreateAPIView):
 
 
 class AuctionList(generics.ListCreateAPIView):
-    def get_serializer_class(self):
-        if self.request.method in SAFE_METHODS:
-            return AuctionListSerializer
-        return AuctionCreateSerializer
-
     filter_backends = (filters.OrderingFilter, DjangoFilterBackend)
     ordering_fields = ('current_price', 'closing_data')
     filterset_fields = ('created_at', )
     permission_classes = [AdminOrReadOnly]
 
+    @staticmethod
+    def check_date(end_date):
+        return date.today() > end_date
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return AuctionListSerializer
+        return AuctionCreateSerializer
+
     def get_queryset(self):
+        for obj in Auction.objects.all():
+            if self.check_date(obj.closing_data):
+                obj.status = 'Closed'
+                obj.save()
+
         if self.request.user.is_staff or self.request.user.is_superuser:
             return Auction.objects.all()
         return Auction.objects.all().filter(status='Open')
