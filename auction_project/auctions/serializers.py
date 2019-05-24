@@ -3,6 +3,7 @@ from rest_framework import serializers
 import datetime
 
 from accounts.models import Profile
+from accounts.serializers import ProfileSerializer
 
 
 class AuctionCreateSerializer(serializers.ModelSerializer):
@@ -25,12 +26,37 @@ class AuctionCreateSerializer(serializers.ModelSerializer):
 
 
 class AuctionListSerializer(serializers.ModelSerializer):
+    owner = serializers.SerializerMethodField()
+    winner = serializers.SerializerMethodField()
+    participants = serializers.SerializerMethodField()
 
     class Meta:
         model = Auction
-        fields = '__all__'
-        # exclude = []
-        depth = 2
+        fields = ('id', 'title', 'initial_price', 'current_price',
+                  'number_of_bids', 'closing_data', 'step', 'status',
+                  'category', 'owner', 'winner', 'participants')
+        # depth = 1
+
+    def get_owner(self, obj):
+        profile = Profile.objects.get(id=obj.owner.id)
+        serializer = ProfileSerializer(profile)
+        return serializer.data
+
+    def get_winner(self, obj):
+        if obj.winner is not None:
+            profile = Profile.objects.get(id=obj.winner.id)
+            serializer = ProfileSerializer(profile)
+            return serializer.data
+        return None
+
+    def get_participants(self, obj):
+        if obj.participants.count() > 0:
+            result = []
+            for x in range(obj.participants.count()):
+                serializer = ProfileSerializer(obj.participants.all()[x])
+                result.append(serializer.data)
+            return result
+        return None
 
 
 class AuctionUpdateSerializer(serializers.ModelSerializer):
