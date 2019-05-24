@@ -12,7 +12,8 @@ from datetime import date
 from .models import Auction, Category
 from .serializers import AuctionCreateSerializer, AuctionListSerializer, \
                          AuctionUpdateSerializer, AuctionBidSerializer, \
-                         AuctionBidListSerializer
+                         AuctionBidListSerializer, CategorySerializer
+        
 from .permissions import AdminOrReadOnly, IsOwnerOrAdmin
 
 from accounts.models import Profile
@@ -101,3 +102,15 @@ class AuctionBid(viewsets.ModelViewSet):
         instance.save()
 
         return self.list(request, instance.id)
+
+
+class CategoryList(generics.ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAdminUser]
+
+
+class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAdminUser]

@@ -1,4 +1,4 @@
-from .models import Auction
+from .models import Auction, Category
 from rest_framework import serializers
 import datetime
 
@@ -11,7 +11,7 @@ class AuctionCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Auction
         fields = ('title', 'description', 'initial_price', 'closing_data',
-                  'step', 'owner')
+                  'step', 'category', 'owner')
         read_only_fields = ('current_price', 'number_of_bits', 'created_at',
                             'status', 'owner', 'winner', 'participants')
 
@@ -86,3 +86,10 @@ class AuctionBidSerializer(serializers.ModelSerializer):
     class Meta:
         model = Auction
         fields = ('bid', )
+
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ('id', 'name')
