@@ -19,12 +19,25 @@ from accounts.models import Profile
 
 
 class AuctionCreate(generics.CreateAPIView):
+    """
+    Create Auction - only for authenticated users.
+    """
     queryset = Auction.objects.all()
     serializer_class = AuctionCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class AuctionList(generics.ListCreateAPIView):
+    """
+    List and Create Auction - List for all users and Create only for admins.
+    Using 'get_serializer_class' to get different serializer
+    for list and create.
+    Using django ordering and filtering for 'current_price' and 'closing_data'
+    fields.
+    Overriding 'queryset' to check auction closing_data and close the auction
+    if the date is in the past. Also, show all auction for the admins and
+    only opened for all other users.
+    """
     filter_backends = (filters.OrderingFilter, DjangoFilterBackend)
     ordering_fields = ('current_price', 'closing_data')
     filterset_fields = ('closing_data', 'current_price')
@@ -51,6 +64,9 @@ class AuctionList(generics.ListCreateAPIView):
 
 
 class AuctionListByUser(generics.ListAPIView):
+    """
+    List Auction on the current user - only for authenticated users.
+    """
     serializer_class = AuctionListSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -60,6 +76,12 @@ class AuctionListByUser(generics.ListAPIView):
 
 
 class AuctionUpdate(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, Update and Delete - Only for owners or admins.
+    Using 'get_serializer_class' to get different serializer
+    for list and update.
+    Owners can not delete if 'number_of_bids' field is different from zero.
+    """
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return AuctionListSerializer
@@ -70,6 +92,14 @@ class AuctionUpdate(generics.RetrieveUpdateDestroyAPIView):
 
 
 class AuctionBid(viewsets.ModelViewSet):
+    """
+    Bid Auction - list for all users and bid only for authenticated.
+    Using 'get_serializer_class' to get different serializer
+    for list and patch.
+    Using 'partial_update' from ModelViewSet to do a bid with patch.
+    Along with this method changes the 'number_of_bids', 'current_price',
+    'winner' and 'participants'.
+    """
     queryset = Auction.objects.all()
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
@@ -106,12 +136,18 @@ class AuctionBid(viewsets.ModelViewSet):
 
 
 class CategoryList(generics.ListCreateAPIView):
+    """
+    List and Create Category - List for all and Create for admin users.
+    """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [AdminOrReadOnly]
 
 
 class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, Update and Delete - Only for admins.
+    """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [permissions.IsAdminUser]

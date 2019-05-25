@@ -14,7 +14,6 @@ class IsNotAuthenticated(BasePermission):
 
 class IsOwnerOrAdmin(BasePermission):
     def has_object_permission(self, request, view, obj):
-        # import pdb; pdb.set_trace()
         is_owner = request.user.username == obj.user.username
         if is_owner or request.user.is_staff or request.user.is_superuser:
             return True

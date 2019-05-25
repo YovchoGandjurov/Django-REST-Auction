@@ -7,7 +7,12 @@ from accounts.serializers import ProfileSerializer
 
 
 class AuctionCreateSerializer(serializers.ModelSerializer):
-
+    """
+    Create Auction.
+    Validate closing_data with 'Field-level validation' to be in the future.
+    Overriding 'create' method to create аn auction, add the current user
+    as owner and update current price to be equal to the initial price.
+    """
     class Meta:
         model = Auction
         fields = ('title', 'description', 'initial_price', 'closing_data',
@@ -33,6 +38,11 @@ class AuctionCreateSerializer(serializers.ModelSerializer):
 
 
 class AuctionListSerializer(serializers.ModelSerializer):
+    """
+    List Auction.
+    Overriding fields 'owner', 'winner' and 'participants' with 'MethodField()'
+    to be represend as nested from the Profile Serializer.
+    """
     owner = serializers.SerializerMethodField()
     winner = serializers.SerializerMethodField()
     participants = serializers.SerializerMethodField()
@@ -42,7 +52,6 @@ class AuctionListSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'initial_price', 'current_price',
                   'number_of_bids', 'closing_data', 'step', 'status',
                   'category', 'owner', 'winner', 'participants')
-        # depth = 1
 
     def get_owner(self, obj):
         profile = Profile.objects.get(id=obj.owner.id)
@@ -67,7 +76,9 @@ class AuctionListSerializer(serializers.ModelSerializer):
 
 
 class AuctionUpdateSerializer(serializers.ModelSerializer):
-
+    """
+    Update Auction.
+    """
     class Meta:
         model = Auction
         fields = ('title', 'description', 'initial_price', 'closing_data',
@@ -77,6 +88,9 @@ class AuctionUpdateSerializer(serializers.ModelSerializer):
 
 
 class AuctionBidSerializer(serializers.ModelSerializer):
+    """
+    Bid Auction - partial update.
+    """
     bid = serializers.IntegerField(write_only=True, min_value=0)
 
     class Meta:
@@ -85,7 +99,9 @@ class AuctionBidSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-
+    """
+    Category - using for full CRUD
+    """
     class Meta:
         model = Category
         fields = ('id', 'name')
