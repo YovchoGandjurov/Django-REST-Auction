@@ -32,15 +32,15 @@ class AuctionList(generics.ListCreateAPIView):
     List and Create Auction - List for all users and Create only for admins.
     Using 'get_serializer_class' to get different serializer
     for list and create.
-    Using django ordering and filtering for 'current_price' and 'closing_data'
+    Using django ordering and filtering for 'current_price' and 'closing_date'
     fields.
-    Overriding 'queryset' to check auction closing_data and close the auction
+    Overriding 'queryset' to check auction closing_date and close the auction
     if the date is in the past. Also, show all auction for the admins and
     only opened for all other users.
     """
     filter_backends = (filters.OrderingFilter, DjangoFilterBackend)
-    ordering_fields = ('current_price', 'closing_data')
-    filterset_fields = ('closing_data', 'current_price')
+    ordering_fields = ('current_price', 'closing_date')
+    filterset_fields = ('closing_date', 'current_price')
     permission_classes = [AdminOrReadOnly]
 
     @staticmethod
@@ -54,7 +54,7 @@ class AuctionList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         for obj in Auction.objects.all():
-            if self.check_date(obj.closing_data):
+            if self.check_date(obj.closing_date):
                 obj.status = 'Closed'
                 obj.save()
 

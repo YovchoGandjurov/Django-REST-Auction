@@ -19,7 +19,7 @@ class Auction(models.Model):
     current_price = models.PositiveIntegerField()
     number_of_bids = models.PositiveIntegerField(default=0)
     created_at = models.DateField(auto_now_add=True)
-    closing_data = models.DateField()
+    closing_date = models.DateField()
     step = models.PositiveIntegerField(default=1)
     status = models.CharField(max_length=50, choices=[
                               (s.name, s.value) for s in StatusEnum],

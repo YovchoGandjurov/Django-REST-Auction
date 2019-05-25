@@ -9,18 +9,18 @@ from accounts.serializers import ProfileSerializer
 class AuctionCreateSerializer(serializers.ModelSerializer):
     """
     Create Auction.
-    Validate closing_data with 'Field-level validation' to be in the future.
+    Validate closing_date with 'Field-level validation' to be in the future.
     Overriding 'create' method to create аn auction, add the current user
     as owner and update current price to be equal to the initial price.
     """
     class Meta:
         model = Auction
-        fields = ('title', 'description', 'initial_price', 'closing_data',
+        fields = ('title', 'description', 'initial_price', 'closing_date',
                   'step', 'category', 'owner')
         read_only_fields = ('current_price', 'number_of_bids', 'created_at',
                             'status', 'owner', 'winner', 'participants')
 
-    def validate_closing_data(self, value):
+    def validate_closing_date(self, value):
         if value < date.today():
             raise serializers.ValidationError(
                 "The Closing date must be in the future."
@@ -50,7 +50,7 @@ class AuctionListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Auction
         fields = ('id', 'title', 'initial_price', 'current_price',
-                  'number_of_bids', 'closing_data', 'step', 'status',
+                  'number_of_bids', 'closing_date', 'step', 'status',
                   'category', 'owner', 'winner', 'participants')
 
     def get_owner(self, obj):
@@ -81,7 +81,7 @@ class AuctionUpdateSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Auction
-        fields = ('title', 'description', 'initial_price', 'closing_data',
+        fields = ('title', 'description', 'initial_price', 'closing_date',
                   'step', 'owner')
         read_only_fields = ('current_price', 'number_of_bids', 'created_at',
                             'status', 'owner', 'winner', 'participants')

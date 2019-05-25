@@ -47,9 +47,17 @@ class RegisterTestCase(APITestCase):
                             self.data['password'],
                             'Password shoild not be in plaintext')
 
+    def test_unique_username_on_create_account(self):
+        create_acc = self.client.post(self.url, data=self.data,
+                                      format='json')
+        self.assertEqual(create_acc.status_code, status.HTTP_201_CREATED)
+        create_acc2 = self.client.post(self.url, data=self.data,
+                                       format='json')
+        self.assertNotEqual(create_acc2, status.HTTP_201_CREATED)
+
 
 class LoginTestCase(APITestCase):
-    url = '/accounts/auth/login/'
+    accounts_url = '/accounts/'
 
     def setUp(self):
         self.client = APIClient()
@@ -67,8 +75,30 @@ class LoginTestCase(APITestCase):
         self.profile = Profile.objects.create(
                 user=self.user, **self.profile_data)
 
-    def test_login_valid_credentials(self):
         self.client.force_authenticate(self.user)
-        profile = Profile.objects.first()
+
+    def test_login_valid_credentials(self):
         get_result = self.client.get('/accounts/' + str(self.user.id) + '/')
         self.assertEqual(get_result.status_code, status.HTTP_200_OK)
+
+    def test_user_can_see_all_users(self):
+        result = self.client.get(self.accounts_url)
+        self.assertEqual(result.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_user_can_update_own_profile(self):
+        put_data = {
+            "email": self.user_data['email'],
+            "first_name": "Ivan",
+            "last_name": "Ivanov",
+            "language": self.profile_data['language']
+        }
+        url = self.accounts_url + str(self.profile.user.id) + '/'
+
+        result = self.client.put(url, put_data, format='json')
+        profile = Profile.objects.first()
+
+        self.assertEqual(result.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(profile.user.first_name,
+                            self.user_data['first_name'])
+        self.assertNotEqual(profile.user.last_name,
+                            self.user_data['last_name'])
