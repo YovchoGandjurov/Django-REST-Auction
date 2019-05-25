@@ -44,12 +44,13 @@ class AuctionTestCase(APITestCase):
             "description": "description test",
             "initial_price": "200",
             "closing_date": get_date('add', 4),
-            "step": "20"
+            "step": "20",
         }
 
         self.create_auction = self.client.post(self.auctions_url + "create/",
                                                self.auction_data,
                                                format='json')
+        self.auction = Auction.objects.first()
 
     def test_create_auction(self):
         auction = Auction.objects.get(
@@ -65,6 +66,14 @@ class AuctionTestCase(APITestCase):
                                           self.auction_data,
                                           format='json')
         self.assertTrue(create_auction.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_auction_with_past_date(self):
+        auction_data = self.auction_data
+        auction_data['closing_date'] = get_date('sub', 5)
+        create_auction = self.client.post(self.auctions_url + "create/",
+                                          auction_data,
+                                          format='json')
+        self.assertTrue(create_auction.status_code != status.HTTP_200_OK)
 
     def test_user_edit_own_auction(self):
 
@@ -92,3 +101,28 @@ class AuctionTestCase(APITestCase):
         auction = Auction.objects.first()
         self.assertEqual(auction.status, 'Closed')
 
+    def test_user_can_delete_own_auction(self):
+        del_url = self.auctions_url + str(self.auction.id) + '/edit/'
+        delete_request = self.client.delete(del_url)
+        self.assertTrue(Auction.objects.count() == 0)
+
+    def test_make_bid_less_than_step_or_with_string(self):
+        bid_url = self.auctions_url + str(self.auction.id) + '/'
+        request = self.client.patch(bid_url, {"bid": 'null'}, format='json')
+        self.assertNotEqual(request.status_code, status.HTTP_200_OK)
+
+        number = int(self.auction.step) - 1
+        request = self.client.patch(bid_url, {"bid": number}, format='json')
+        self.assertNotEqual(request.status_code, status.HTTP_200_OK)
+
+    def test_unauth_user_can_bid(self):
+        self.client.logout()
+        bid_url = self.auctions_url + str(self.auction.id) + '/'
+        number = int(self.auction.step) + 1
+        request = self.client.patch(bid_url, {"bid": number}, format='json')
+        self.assertNotEqual(request.status_code, status.HTTP_200_OK)
+
+    def test_post_category(self):
+        url = self.auctions_url + '/category/'
+        request = self.client.post(url, {"name": "Technology"}, format='json')
+        self.assertNotEqual(request.status_code, status.HTTP_200_OK)
