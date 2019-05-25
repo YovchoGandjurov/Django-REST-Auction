@@ -8,10 +8,12 @@ urlpatterns = [
     path('mine/', views.AuctionListByUser.as_view(), name='mine'),
     re_path('^(?P<pk>\d+)/edit/$', views.AuctionUpdate.as_view(),
             name='auction-edit'),
-    re_path('^(?P<pk>\d+)/bid/$',
-            views.AuctionBid.as_view({'get': 'list', 'patch': 'partial_update'}),
+    re_path('^(?P<pk>\d+)/$',
+            views.AuctionBid.as_view(
+                    {'get': 'list', 'patch': 'partial_update'}
+            ),
             name='auction-bid'),
     path('category/', views.CategoryList.as_view(), name='category-list'),
     re_path('^category/(?P<pk>\d+)/$', views.CategoryDetail.as_view(),
-            name='category-detail')    
+            name='category-detail')
 ]

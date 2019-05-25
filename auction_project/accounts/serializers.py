@@ -70,8 +70,11 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
                                      required=False)
     email = serializers.EmailField(source='user.email')
     first_name = serializers.CharField(source='user.first_name',
-                                       write_only=True)
-    last_name = serializers.CharField(source='user.last_name', write_only=True)
+                                       write_only=True,
+                                       required=False)
+    last_name = serializers.CharField(source='user.last_name',
+                                      write_only=True,
+                                      required=False)
     first_last_name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:

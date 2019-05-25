@@ -12,4 +12,6 @@ class IsOwnerOrAdmin(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.user.is_staff or request.user.is_superuser:
             return True
-        return request.user == obj.owner.user and obj.number_of_bits == 0
+        elif request.method == "DELETE" and obj.number_of_bids != 0:
+            return False
+        return request.user == obj.owner.user

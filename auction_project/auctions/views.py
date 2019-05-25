@@ -12,8 +12,7 @@ from datetime import date
 from .models import Auction, Category
 from .serializers import AuctionCreateSerializer, AuctionListSerializer, \
                          AuctionUpdateSerializer, AuctionBidSerializer, \
-                         AuctionBidListSerializer, CategorySerializer
-        
+                         CategorySerializer
 from .permissions import AdminOrReadOnly, IsOwnerOrAdmin
 
 from accounts.models import Profile
@@ -28,7 +27,7 @@ class AuctionCreate(generics.CreateAPIView):
 class AuctionList(generics.ListCreateAPIView):
     filter_backends = (filters.OrderingFilter, DjangoFilterBackend)
     ordering_fields = ('current_price', 'closing_data')
-    filterset_fields = ('created_at', )
+    filterset_fields = ('closing_data', 'current_price')
     permission_classes = [AdminOrReadOnly]
 
     @staticmethod
@@ -72,7 +71,7 @@ class AuctionUpdate(generics.RetrieveUpdateDestroyAPIView):
 
 class AuctionBid(viewsets.ModelViewSet):
     queryset = Auction.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
@@ -81,7 +80,7 @@ class AuctionBid(viewsets.ModelViewSet):
 
     def list(self, request, pk):
         queryset = Auction.objects.all().filter(id=pk)
-        serializer = AuctionBidListSerializer(queryset, many=True)
+        serializer = AuctionListSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def partial_update(self, request, *args, **kwargs):
@@ -93,7 +92,9 @@ class AuctionBid(viewsets.ModelViewSet):
         if not str(bid).isdigit():
             raise serializers.ValidationError("The value must be a digit.")
         if bid < instance.step:
-            raise serializers.ValidationError("The bid must be greater than step.")
+            raise serializers.ValidationError(
+                "The bid must be greater than or equal to step."
+            )
 
         instance.number_of_bids = instance.number_of_bids + 1
         instance.current_price = instance.current_price + bid
@@ -107,7 +108,7 @@ class AuctionBid(viewsets.ModelViewSet):
 class CategoryList(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [AdminOrReadOnly]
 
 
 class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):

@@ -1,6 +1,6 @@
 from .models import Auction, Category
 from rest_framework import serializers
-import datetime
+from datetime import date
 
 from accounts.models import Profile
 from accounts.serializers import ProfileSerializer
@@ -12,8 +12,15 @@ class AuctionCreateSerializer(serializers.ModelSerializer):
         model = Auction
         fields = ('title', 'description', 'initial_price', 'closing_data',
                   'step', 'category', 'owner')
-        read_only_fields = ('current_price', 'number_of_bits', 'created_at',
+        read_only_fields = ('current_price', 'number_of_bids', 'created_at',
                             'status', 'owner', 'winner', 'participants')
+
+    def validate_closing_data(self, value):
+        if value < date.today():
+            raise serializers.ValidationError(
+                "The Closing date must be in the future."
+            )
+        return value
 
     def create(self, validated_data):
         curr_user = Profile.objects.get(
@@ -65,19 +72,8 @@ class AuctionUpdateSerializer(serializers.ModelSerializer):
         model = Auction
         fields = ('title', 'description', 'initial_price', 'closing_data',
                   'step', 'owner')
-        read_only_fields = ('current_price', 'number_of_bits', 'created_at',
+        read_only_fields = ('current_price', 'number_of_bids', 'created_at',
                             'status', 'owner', 'winner', 'participants')
-
-
-class AuctionBidListSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Auction
-        fields = ('id', 'title', 'description', 'current_price',
-                  'number_of_bids', 'step', 'closing_data', 'owner',
-                  'winner', 'participants'
-                  )
-        # depth = 2
 
 
 class AuctionBidSerializer(serializers.ModelSerializer):
