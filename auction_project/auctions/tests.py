@@ -56,7 +56,7 @@ class AuctionTestCase(APITestCase):
         auction = Auction.objects.get(
             owner_id=self.create_auction.data['owner']
         )
-        edit_url = self.auctions_url + str(auction.id) + "/edit/"
+        edit_url = self.auctions_url + str(auction.id) + "/"
         get_response = self.client.get(edit_url)
         self.assertEqual(get_response.status_code, status.HTTP_200_OK)
 
@@ -79,7 +79,7 @@ class AuctionTestCase(APITestCase):
 
         # test user reach edit url
         auction = Auction.objects.first()
-        edit_url = self.auctions_url + str(auction.id) + '/edit/'
+        edit_url = self.auctions_url + str(auction.id) + '/'
         get_request = self.client.get(edit_url)
         self.assertEqual(get_request.status_code, status.HTTP_200_OK)
 
@@ -102,12 +102,12 @@ class AuctionTestCase(APITestCase):
         self.assertEqual(auction.status, 'Closed')
 
     def test_user_can_delete_own_auction(self):
-        del_url = self.auctions_url + str(self.auction.id) + '/edit/'
+        del_url = self.auctions_url + str(self.auction.id) + '/'
         delete_request = self.client.delete(del_url)
         self.assertTrue(Auction.objects.count() == 0)
 
     def test_make_bid_less_than_step_or_with_string(self):
-        bid_url = self.auctions_url + str(self.auction.id) + '/'
+        bid_url = self.auctions_url + str(self.auction.id) + '/bid/'
         request = self.client.patch(bid_url, {"bid": 'null'}, format='json')
         self.assertNotEqual(request.status_code, status.HTTP_200_OK)
 
@@ -117,7 +117,7 @@ class AuctionTestCase(APITestCase):
 
     def test_unauth_user_can_bid(self):
         self.client.logout()
-        bid_url = self.auctions_url + str(self.auction.id) + '/'
+        bid_url = self.auctions_url + str(self.auction.id) + '/bid/'
         number = int(self.auction.step) + 1
         request = self.client.patch(bid_url, {"bid": number}, format='json')
         self.assertNotEqual(request.status_code, status.HTTP_200_OK)

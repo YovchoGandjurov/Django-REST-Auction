@@ -15,7 +15,7 @@ class AuctionCreateSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Auction
-        fields = ('title', 'description', 'initial_price', 'closing_date',
+        fields = ('id', 'title', 'description', 'initial_price', 'closing_date',
                   'step', 'category', 'owner')
         read_only_fields = ('current_price', 'number_of_bids', 'created_at',
                             'status', 'owner', 'winner', 'participants')
@@ -81,7 +81,7 @@ class AuctionUpdateSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Auction
-        fields = ('title', 'description', 'initial_price', 'closing_date',
+        fields = ('id', 'title', 'description', 'initial_price', 'closing_date',
                   'step', 'owner')
         read_only_fields = ('current_price', 'number_of_bids', 'created_at',
                             'status', 'owner', 'winner', 'participants')
