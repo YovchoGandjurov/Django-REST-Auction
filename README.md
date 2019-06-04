@@ -51,3 +51,6 @@ REST project that serves to create and store auctions. There is a simple login/r
 - Used 'dotenv' package to store sensitive information in .env file.
 - Used 'rest_framework_swagger' to represend project schema.
 - Added django REST pagination.
+
+# Certificate
+<p align="center"><img src="CERTIFICATE - Django Web Development.png" alt="CERTIFICATE"></p>
